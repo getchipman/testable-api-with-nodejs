@@ -1,0 +1,8 @@
+{
+    "extension": ["js"],
+    "package": "./package.json",
+    "reporter": "spec",
+    "slow": 5000,
+    "require": "test/unit/helpers.js",
+    "spec": ["test/unit/**/*_spec.js"]
+  }
