@@ -1,8 +1,6 @@
 const Product = require('../../../src/models/products');
 
 describe('Routes: Products', () => {
-    let request;
-    let app;
 
     const defaultId = '56cb91bdc3464f14678934ca';
 
@@ -20,8 +18,9 @@ describe('Routes: Products', () => {
     };
 
     before(async () => {
-        app = await setupApp();
-        request = supertest(app);
+        const app = await setupApp();
+        global.app = app;
+        global.request = supertest(app);
     });
 
     beforeEach(async() => {
