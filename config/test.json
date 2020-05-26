@@ -1,0 +1,5 @@
+{
+    "database": {
+        "mongoUrl": "mongodb://tester:testerpass@localhost:27017/admin"
+    }
+}

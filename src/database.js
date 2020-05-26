@@ -3,6 +3,10 @@ require('dotenv').config();
 
 const mongodbUrl = process.env.MONGODB_URL || 'mongodb://localhost:27017/';
 
+// tentar arrumar config
+//const config = require('config');
+//const mongodbUrl = config.get(database.mongoUrl);
+
 //promise
 const connect = () => 
     mongoose.connect(mongodbUrl, {
