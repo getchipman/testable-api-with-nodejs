@@ -1,4 +1,5 @@
 const User = require('../../../src/models/user');
+const AuthService = require('../../../src/services/auth');
 
 describe('Routes: Users', () => {   
     const defaultId = '56cb91bdc3464f14678934ca';   
@@ -15,6 +16,7 @@ describe('Routes: Users', () => {
         email: 'jhon@mail.com',
         role: 'admin'
     };
+    const authToken = AuthService.generateToken(expectedAdminUser);
 
     before(async () => {
         const app = await setupApp();
@@ -33,11 +35,42 @@ describe('Routes: Users', () => {
 
     after(async () => await app.database.connection.close());
 
+    describe('POST /users/authenticate', () => {
+        context('when authenticating an user', () => {
+            it('should generate a valid token', done => {
+                request
+                    .post(`/users/authenticate`)
+                    .send({
+                        email: 'jhon@mail.com',
+                        password: '123password'
+                    })
+                    .end((err, res) => {
+                        expect(res.body).to.have.key('token');
+                        expect(res.status).to.eql(200);
+                    });
+                done();    
+            });
+            it('should return unauthorized when the password does not match', done => {
+                request
+                    .post(`/users/authenticate`)
+                    .send({
+                        email: 'jhon@mail.com',
+                        password: 'wrongpassword'
+                    })
+                    .end((err, res) => {
+                        expect(res.status).to.eql(401);
+                        done(err);
+                    })
+            });
+        });
+    });
+
     describe('GET /users', () => {
         it('should return a list of users', done => {
 
             request
             .get('/users')
+            .set({'x-access-token': authToken})
             .end((err, res) => {
                 const body = [
                     {__v: res.body[0].__v,
@@ -56,6 +89,7 @@ describe('Routes: Users', () => {
 
             request
                 .get(`/users/${defaultId}`)
+                .set({'x-access-token': authToken})
                 .end((err, res) => {
                     expect(res.statusCode).to.eql(200);
                     const body = [
@@ -87,6 +121,7 @@ describe('Routes: Users', () => {
 
             request
                 .post('/users')
+                .set({'x-access-token': authToken})
                 .send(newUser)
                 .end((err, res) => {
                     expect(res.statusCode).to.eql(201);
@@ -113,6 +148,7 @@ describe('Routes: Users', () => {
 
             request
                 .put(`/users/${defaultId}`)
+                .set({'x-access-token': authToken})
                 .send(updatedUser)
                 .end((err, res) => {
                 expect(res.status).to.eql(200);
@@ -128,6 +164,7 @@ describe('Routes: Users', () => {
 
             request
                 .delete(`/users/${defaultId}`)
+                .set({'x-access-token': authToken})
                 .end((err, res) => {
                 expect(res.status).to.eql(204);
                 done(err);
