@@ -1,6 +1,22 @@
 class UsersController {
-    constructor(User) {
+    constructor(User, AuthService) {
       this.User = User;
+      this.AuthService = AuthService;
+    }
+
+    async authenticate(req, res) {
+        const authService = new this.AuthService(this.User);
+        const user = await authService.authenticate(req.body);
+        if(!user) {
+          return res.sendStatus(401);
+        }
+        const token = this.AuthService.generateToken({
+            name: user.name,
+            email: user.email,
+            password: user.password,
+            role: user.role
+          });
+          return res.send({token});
     }
   
     async get(req, res) {
